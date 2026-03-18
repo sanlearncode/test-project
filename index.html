@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Demo Supabase</title>
+</head>
+<body>
+  <h1>User List</h1>
+
+  <input id="name" placeholder="Nhập tên">
+  <button onclick="addUser()">Thêm</button>
+
+  <ul id="list"></ul>
+
+  <script>
+    const API = "/.netlify/functions/api";
+
+    async function loadUsers() {
+      const res = await fetch(API);
+      const data = await res.json();
+
+      const list = document.getElementById("list");
+      list.innerHTML = "";
+
+      data.forEach(u => {
+        const li = document.createElement("li");
+        li.innerText = u.name;
+        list.appendChild(li);
+      });
+    }
+
+    async function addUser() {
+      const name = document.getElementById("name").value;
+
+      await fetch(API, {
+        method: "POST",
+        body: JSON.stringify({ name })
+      });
+
+      loadUsers();
+    }
+
+    loadUsers();
+  </script>
+</body>
+</html>
