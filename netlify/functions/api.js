@@ -7,14 +7,8 @@ exports.handler = async (event) => {
 
   await client.connect();
 
-  await client.query(`
-    CREATE TABLE IF NOT EXISTS users (
-      id SERIAL PRIMARY KEY,
-      name TEXT
-    );
-  `);
-
   try {
+    // Lấy danh sách
     if (event.httpMethod === "GET") {
       const result = await client.query("SELECT * FROM users ORDER BY id DESC");
       return {
@@ -22,21 +16,20 @@ exports.handler = async (event) => {
         body: JSON.stringify(result.rows),
       };
     }
+
+    // Thêm
     if (event.httpMethod === "POST") {
       const { name } = JSON.parse(event.body);
-
-      if (!name) {
-        return { statusCode: 400, body: "Thiếu tên" };
-      }
 
       await client.query("INSERT INTO users(name) VALUES($1)", [name]);
 
       return {
         statusCode: 200,
-        body: JSON.stringify({ message: "Đã thêm" }),
+        body: JSON.stringify({ message: "Added" }),
       };
     }
 
+    // Xóa
     if (event.httpMethod === "DELETE") {
       const { id } = JSON.parse(event.body);
 
@@ -44,7 +37,7 @@ exports.handler = async (event) => {
 
       return {
         statusCode: 200,
-        body: JSON.stringify({ message: "Đã xóa" }),
+        body: JSON.stringify({ message: "Deleted" }),
       };
     }
 
