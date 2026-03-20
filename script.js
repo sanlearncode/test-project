@@ -12,7 +12,7 @@ async function load() {
   ).join("");
 }
 
-async function add() {
+async function add() {  
   const inp = document.getElementById("inp");
   const name = inp.value.trim();
   if (!name) return;
