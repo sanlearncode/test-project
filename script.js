@@ -1,48 +1,30 @@
-const API = "/.netlify/functions/api";
+const API = "/.netlify/functions/names";
 
-// Load dữ liệu
-async function loadData() {
-  const res = await fetch(API);
-  const data = await res.json();
-
+async function load() {
+  const r = await fetch(API).then(r => r.json());
   const list = document.getElementById("list");
-  list.innerHTML = "";
-
-  data.forEach(user => {
-    const li = document.createElement("li");
-
-    li.innerHTML = `
-      ${user.name}
-      <button onclick="deleteName(${user.id})">Xóa</button>
-    `;
-
-    list.appendChild(li);
-  });
+  if (!r.names.length) {
+    list.innerHTML = '<li class="empty">Chưa có tên nào.</li>';
+    return;
+  }
+  list.innerHTML = r.names.map(n =>
+    `<li>${n.name} <button onclick="del(${n.id})">xóa</button></li>`
+  ).join("");
 }
 
-// Thêm tên
-async function addName() {
-  const input = document.getElementById("nameInput");
-  const name = input.value;
-
-  await fetch(API, {
-    method: "POST",
-    body: JSON.stringify({ name }),
-  });
-
-  input.value = "";
-  loadData();
+async function add() {
+  const inp = document.getElementById("inp");
+  const name = inp.value.trim();
+  if (!name) return;
+  await fetch(API, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name }) });
+  inp.value = "";
+  load();
 }
 
-// Xóa tên
-async function deleteName(id) {
-  await fetch(API, {
-    method: "DELETE",
-    body: JSON.stringify({ id }),
-  });
-
-  loadData();
+async function del(id) {
+  await fetch(`${API}/${id}`, { method: "DELETE" });
+  load();
 }
 
-// chạy khi mở web
-loadData();
+document.getElementById("inp").addEventListener("keydown", e => e.key === "Enter" && add());
+load();
