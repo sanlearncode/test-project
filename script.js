@@ -1,4 +1,4 @@
-const API = "/.netlify/functions/names";
+const API = "/.netlify/functions/api";
 
 async function load() {
   try {
